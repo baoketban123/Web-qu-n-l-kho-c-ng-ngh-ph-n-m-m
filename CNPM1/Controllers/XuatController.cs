@@ -19,7 +19,7 @@ namespace CNPM1.Controllers
         {
             var sales = db.Sales.AsQueryable();
 
-            // Apply date filtering if dates are provided
+            // filter date ra
             if (!string.IsNullOrEmpty(fromDate))
             {
                 DateTime from = DateTime.Parse(fromDate);
@@ -29,7 +29,7 @@ namespace CNPM1.Controllers
 
             if (!string.IsNullOrEmpty(toDate))
             {
-                DateTime to = DateTime.Parse(toDate).AddDays(1); // Include the entire end date
+                DateTime to = DateTime.Parse(toDate).AddDays(1);
                 sales = sales.Where(s => s.DateSale < to);
                 ViewBag.ToDate = toDate;
             }
@@ -76,7 +76,7 @@ namespace CNPM1.Controllers
         {
             var sales = db.Sales.AsQueryable();
 
-            // Apply date filtering if dates are provided
+            // filter date ra
             if (!string.IsNullOrEmpty(fromDate))
             {
                 DateTime from = DateTime.Parse(fromDate);
@@ -93,7 +93,7 @@ namespace CNPM1.Controllers
 
             var listSales = sales.OrderByDescending(x => x.DateSale).ToList();
 
-            // Calculate totals for the report
+            // tính tổng
             ViewBag.TotalQuantity = listSales.Sum(s => Convert.ToInt32(s.SLSale));
             ViewBag.TotalRecords = listSales.Count();
 

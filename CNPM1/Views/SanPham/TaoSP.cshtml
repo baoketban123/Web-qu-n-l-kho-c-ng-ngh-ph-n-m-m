@@ -64,7 +64,7 @@
             var formIsValid = true;
             var checkInProgress = false;
 
-            // Autocomplete
+            // tự động điền
             tenSPInput.autocomplete({
                 source: function (request, response) {
                     $.ajax({
@@ -80,16 +80,15 @@
                 delay: 300
             });
 
-            // Debounced check for duplicate names
+            // check trùng sản phẩm
             var timeoutId;
             tenSPInput.on('input', function() {
                 var productName = $(this).val().trim();
 
-                // Clear previous timeout
                 clearTimeout(timeoutId);
 
                 if (productName) {
-                    // Set timeout to avoid too many requests
+                    // timeout tránh nhiều request (optimize)
                     timeoutId = setTimeout(function() {
                         checkInProgress = true;
                         $.ajax({
@@ -112,14 +111,13 @@
                             },
                             error: function() {
                                 checkInProgress = false;
-                                // On error, allow submission but server will catch duplicates
                                 productNameError.hide();
                                 submitButton.prop('disabled', false);
                                 submitButton.removeClass('btn-secondary').addClass('btn-primary');
                                 formIsValid = true;
                             }
                         });
-                    }, 500); // Wait 500ms after user stops typing
+                    }, 500);
                 } else {
                     productNameError.hide();
                     submitButton.prop('disabled', false);
@@ -128,7 +126,7 @@
                 }
             });
 
-            // Form submission validation
+            // form kiểm tra trong dữ liệu
             $('form').submit(function(e) {
                 if (checkInProgress) {
                     e.preventDefault();

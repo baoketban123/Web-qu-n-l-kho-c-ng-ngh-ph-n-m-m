@@ -57,7 +57,7 @@ namespace cnpm_ck.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Register(TaiKhoan cus)
         {
-            // Check if someone has already registered with this username
+            //Check xem đã tồn tại tài khoản chưa
             var nguoidung = db.TaiKhoans.FirstOrDefault(x => x.userName == cus.userName);
             if (ModelState.IsValid)
             {
@@ -67,7 +67,7 @@ namespace cnpm_ck.Controllers
                 }
                 if (ModelState.IsValid)
                 {
-                    // Set default role if not specified
+                    //Role default khi chưa phân
                     if (cus.idRole == null)
                     {
                         cus.idRole = 2; // Default role
@@ -87,11 +87,10 @@ namespace cnpm_ck.Controllers
 
         public ActionResult DangXuat()
         {
-            // Remove session
+            // Logout session ra
             Session.Remove("user");
             Session.Remove("UserName");
             Session.Remove("idrole");
-            // Remove session from authenticator
             FormsAuthentication.SignOut();
             return RedirectToAction("Index", "Home");
         }

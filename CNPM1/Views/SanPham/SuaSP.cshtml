@@ -76,12 +76,12 @@
             var saveButton = $('#saveButton');
             var quantityStatus = $('#quantityStatus');
 
-            // Initialize total quantity display
+            // Init tổng số lượng
             updateTotalQuantity();
 
-            // Real-time calculation when user types
+            // Cập nhật theo thời gian thực
             additionalInput.on('input', function () {
-                // Ensure only positive numbers
+                // Chỉ được thêm số dương
                 var value = parseInt($(this).val());
                 if (value < 0 || isNaN(value)) {
                     $(this).val(0);
@@ -92,7 +92,7 @@
             function updateTotalQuantity() {
                 var additionalQty = parseInt(additionalInput.val()) || 0;
 
-                // Ensure additional quantity is not negative
+                // bớt thì ko đc
                 if (additionalQty < 0) {
                     additionalQty = 0;
                     additionalInput.val(0);
@@ -100,13 +100,13 @@
 
                 var totalQty = currentQty + additionalQty;
 
-                // Update display
+                // cập nhật display
                 totalInput.val(totalQty);
 
-                // Update hidden field for form submission
+                
                 hiddenSLSP.val(totalQty.toString());
 
-                // Update status message
+                // cập nhật trạng thái
                 if (additionalQty > 0) {
                     quantityStatus.text('✅ Nhập thêm ' + additionalQty + ' sản phẩm vào kho').removeClass('text-muted').addClass('text-success');
                     saveButton.prop('disabled', false).text('Nhập hàng');
@@ -116,7 +116,7 @@
                 }
             }
 
-            // Form submission validation
+            // check form
             $('form').submit(function (e) {
                 var additionalQty = parseInt(additionalInput.val()) || 0;
                 if (additionalQty <= 0) {
