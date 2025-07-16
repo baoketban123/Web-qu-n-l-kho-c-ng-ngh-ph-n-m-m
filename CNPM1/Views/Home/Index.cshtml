@@ -1,0 +1,94 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+    body {
+        margin: 0; /* Reset body margin to ensure full-width sections */
+    }
+
+    .jumbotron {
+        background-image: url('https://images.unsplash.com/photo-1567701182324-9d2757236852?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'); /* Replace with your image URL */
+        background-size: cover;
+        background-position: center; /* Center the image */
+        color: white;
+        text-align: center;
+        padding: 100px 0;
+        margin-bottom: 0;
+        border-radius: 0;
+        width: 100%; /* Ensure full width */
+        box-sizing: border-box; /* Include padding and border in the element's total width and height */
+    }
+
+    .center {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        width: 50%;
+    }
+    .lead {
+        font-size: 1.5em;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+
+        .btn-primary:hover {
+            background-color: #0069d9;
+            border-color: #0062cc;
+        }
+
+    .features {
+        padding: 50px 0;
+        text-align: center;
+    }
+
+    .feature {
+        margin-bottom: 30px;
+    }
+
+        .feature i {
+            font-size: 3em;
+            color: #007bff;
+        }
+</style>
+
+<div>
+    <img src="~/assets/images/wms.png" alt="WMS Logo" style="max-width: 1080px; height: auto;" class="center" />
+</div>
+<div class="jumbotron">
+    <h1>Chào mừng đến với hệ thống quản lý kho</h1>
+    <p class="lead">Quản lý kho hàng hiệu quả hơn bao giờ hết.</p>
+    <p><a href="@Url.Action("About", "Home")" class="btn btn-primary btn-lg">Tìm hiểu thêm &raquo;</a></p>
+</div>
+
+<div class="features">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 feature">
+                <i class="fas fa-box-open"></i>
+                <h3>Quản lý sản phẩm</h3>
+                <p>Dễ dàng thêm, sửa, xóa sản phẩm trong kho.</p>
+                <p><a class="btn btn-secondary" href="@Url.Action("XemSP", "SanPham")">Xem chi tiết &raquo;</a></p>
+            </div>
+            <div class="col-md-4 feature">
+                <i class="fas fa-truck"></i>
+                <h3>Quản lý xuất nhập</h3>
+                <p>Theo dõi và quản lý các hoạt động xuất nhập hàng.</p>
+                <p><a class="btn btn-secondary" href="@Url.Action("XemSP", "Xuat")">Xem chi tiết &raquo;</a></p>
+            </div>
+            <div class="col-md-4 feature">
+                <i class="fas fa-chart-bar"></i>
+                <h3>Báo cáo thống kê</h3>
+                <p>Xem báo cáo và thống kê về tình hình kho hàng.</p>
+                <p><a class="btn btn-secondary" href="#">Xem chi tiết &raquo;</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+}

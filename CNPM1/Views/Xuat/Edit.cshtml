@@ -1,0 +1,60 @@
+﻿@model CNPM1.Models.Sale
+
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Views/Shared/_LayoutNV.cshtml";
+}
+
+<h2>Sửa đơn xuất</h2>
+
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    
+<div class="form-horizontal">
+    <hr />
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    @Html.HiddenFor(model => model.id)
+    @Html.HiddenFor(model => model.tenSPSale)
+
+    <div class="form-group">
+        <label class="control-label col-md-2" style="font-weight:bold; font-size:1.5em;">Tên Sản phẩm</label>
+        <div class="col-md-10">
+            <div style="border:1px solid #ccc; border-radius:4px; padding:10px; background:#f9f9f9; font-size:1.2em;">
+                @Html.DisplayFor(model => model.tenSPSale)
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.Label("Số lượng", htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.SLSale, new { htmlAttributes = new { @class = "form-control", @data_val = "true", @required = "required", type = "number" } })
+            @Html.ValidationMessageFor(model => model.SLSale, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.Label("Ngày", htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.TextBoxFor(model => model.DateSale, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date", @data_val = "true", @required = "required" })
+            @Html.ValidationMessageFor(model => model.DateSale, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <p />
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="submit" value="Lưu" class="btn btn-outline-success" />
+        </div>
+    </div>
+</div>
+}
+<p/>
+<div>
+    @Html.ActionLink("Hủy", "XemSP", "Xuat", new { @class = "btn btn-primary" })
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

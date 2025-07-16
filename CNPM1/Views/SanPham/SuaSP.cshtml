@@ -1,0 +1,151 @@
+﻿@model CNPM1.Models.SanPham
+
+@{
+    ViewBag.Title = "SuaSP";
+    Layout = "~/Views/Shared/_LayoutNV.cshtml";
+}
+
+<h2>Nhập thêm hàng vào kho</h2>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(model => model.id)
+        @Html.HiddenFor(model => model.tenSP)
+        @Html.HiddenFor(model => model.SLSP, new { @id = "hiddenSLSP" })
+
+        <div class="form-group">
+            @Html.Label("Tên Sản phẩm", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <div class="form-control" style="background-color: #f9f9f9; cursor: not-allowed; font-weight:bold;">
+                    @Model.tenSP
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.Label("Số lượng hiện tại", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <input type="text" id="currentQuantity" class="form-control" value="@Model.SLSP" readonly style="background-color: #f9f9f9; cursor: not-allowed;" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.Label("Số lượng nhập thêm", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <input type="number" id="additionalQuantity" class="form-control" placeholder="Nhập số lượng cần thêm" step="1" min="0" />
+                <small class="text-success">Chỉ có thể nhập thêm hàng vào kho</small>
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.Label("Tổng số lượng sau khi nhập", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <input type="text" id="totalQuantity" class="form-control" readonly style="background-color: #e9ecef; font-weight: bold; font-size: 1.1em; color: #28a745;" />
+                <span id="quantityStatus" class="text-muted"></span>
+            </div>
+        </div>
+
+        <p></p>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Nhập hàng" id="saveButton" class="btn btn-success" />
+            </div>
+        </div>
+    </div>
+}
+<p>
+</p>
+<div>
+    @Html.ActionLink("Hủy", "XemSP", "SanPham", new { @class = "btn btn-secondary" })
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script>
+        $(function () {
+            var currentQty = parseInt($('#currentQuantity').val()) || 0;
+            var additionalInput = $('#additionalQuantity');
+            var totalInput = $('#totalQuantity');
+            var hiddenSLSP = $('#hiddenSLSP');
+            var saveButton = $('#saveButton');
+            var quantityStatus = $('#quantityStatus');
+
+            // Initialize total quantity display
+            updateTotalQuantity();
+
+            // Real-time calculation when user types
+            additionalInput.on('input', function () {
+                // Ensure only positive numbers
+                var value = parseInt($(this).val());
+                if (value < 0 || isNaN(value)) {
+                    $(this).val(0);
+                }
+                updateTotalQuantity();
+            });
+
+            function updateTotalQuantity() {
+                var additionalQty = parseInt(additionalInput.val()) || 0;
+
+                // Ensure additional quantity is not negative
+                if (additionalQty < 0) {
+                    additionalQty = 0;
+                    additionalInput.val(0);
+                }
+
+                var totalQty = currentQty + additionalQty;
+
+                // Update display
+                totalInput.val(totalQty);
+
+                // Update hidden field for form submission
+                hiddenSLSP.val(totalQty.toString());
+
+                // Update status message
+                if (additionalQty > 0) {
+                    quantityStatus.text('✅ Nhập thêm ' + additionalQty + ' sản phẩm vào kho').removeClass('text-muted').addClass('text-success');
+                    saveButton.prop('disabled', false).text('Nhập hàng');
+                } else {
+                    quantityStatus.text('Chưa có số lượng nhập thêm').removeClass('text-success').addClass('text-muted');
+                    saveButton.prop('disabled', true).text('Nhập số lượng để tiếp tục');
+                }
+            }
+
+            // Form submission validation
+            $('form').submit(function (e) {
+                var additionalQty = parseInt(additionalInput.val()) || 0;
+                if (additionalQty <= 0) {
+                    e.preventDefault();
+                    alert('Vui lòng nhập số lượng cần thêm vào kho.');
+                    return false;
+                }
+                return true;
+            });
+        });
+    </script>
+
+    <style>
+        #totalQuantity {
+            color: #28a745 !important;
+        }
+
+        .btn:disabled {
+            cursor: not-allowed;
+        }
+
+        #additionalQuantity::-webkit-outer-spin-button,
+        #additionalQuantity::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        #additionalQuantity[type=number] {
+            -moz-appearance: textfield;
+        }
+    </style>
+}

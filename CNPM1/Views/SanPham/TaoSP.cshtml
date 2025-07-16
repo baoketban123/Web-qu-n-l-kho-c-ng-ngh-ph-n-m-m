@@ -1,0 +1,163 @@
+﻿@model CNPM1.Models.SanPham
+
+@{
+    ViewBag.Title = "TaoSP";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Thêm Sản phẩm vào kho hàng</h2>
+<div>
+    @Html.ActionLink("Hủy", "XemSP", new { }, new { @class = "btn btn-danger" })
+</div>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <div class="form-group">
+            @Html.Label("Tên Sản phẩm", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.tenSP, new
+                {
+                    htmlAttributes = new
+                    {
+                        @class = "form-control",
+                        @data_val = "true",
+                        @required = "required",
+                        autocomplete = "off"
+                    }
+                })
+                @Html.ValidationMessageFor(model => model.tenSP, "", new { @class = "text-danger" })
+                <span id="productNameError" class="text-danger" style="display:none;">Tên sản phẩm đã tồn tại</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.Label("Số lượng", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.SLSP, new { htmlAttributes = new { @class = "form-control", @data_val = "true", @required = "required", type = "number", min = "1" } })
+                @Html.ValidationMessageFor(model => model.SLSP, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <p></p>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Nhập" id="submitButton" class="btn btn-primary" />
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+    <script>
+        $(function () {
+            var submitButton = $("#submitButton");
+            var productNameError = $("#productNameError");
+            var tenSPInput = $("#tenSP");
+            var formIsValid = true;
+            var checkInProgress = false;
+
+            // Autocomplete
+            tenSPInput.autocomplete({
+                source: function (request, response) {
+                    $.ajax({
+                        url: '@Url.Action("GetProductSuggestions", "SanPham")',
+                        type: 'GET',
+                        data: { term: request.term },
+                        success: function (data) {
+                            response(data);
+                        }
+                    });
+                },
+                minLength: 1,
+                delay: 300
+            });
+
+            // Debounced check for duplicate names
+            var timeoutId;
+            tenSPInput.on('input', function() {
+                var productName = $(this).val().trim();
+
+                // Clear previous timeout
+                clearTimeout(timeoutId);
+
+                if (productName) {
+                    // Set timeout to avoid too many requests
+                    timeoutId = setTimeout(function() {
+                        checkInProgress = true;
+                        $.ajax({
+                            url: '@Url.Action("IsProductNameAvailable", "SanPham")',
+                            type: 'POST',
+                            data: { tenSP: productName },
+                            success: function(isAvailable) {
+                                checkInProgress = false;
+                                if (!isAvailable) {
+                                    productNameError.show();
+                                    submitButton.prop('disabled', true);
+                                    submitButton.removeClass('btn-primary').addClass('btn-secondary');
+                                    formIsValid = false;
+                                } else {
+                                    productNameError.hide();
+                                    submitButton.prop('disabled', false);
+                                    submitButton.removeClass('btn-secondary').addClass('btn-primary');
+                                    formIsValid = true;
+                                }
+                            },
+                            error: function() {
+                                checkInProgress = false;
+                                // On error, allow submission but server will catch duplicates
+                                productNameError.hide();
+                                submitButton.prop('disabled', false);
+                                submitButton.removeClass('btn-secondary').addClass('btn-primary');
+                                formIsValid = true;
+                            }
+                        });
+                    }, 500); // Wait 500ms after user stops typing
+                } else {
+                    productNameError.hide();
+                    submitButton.prop('disabled', false);
+                    submitButton.removeClass('btn-secondary').addClass('btn-primary');
+                    formIsValid = true;
+                }
+            });
+
+            // Form submission validation
+            $('form').submit(function(e) {
+                if (checkInProgress) {
+                    e.preventDefault();
+                    alert('Đang kiểm tra tên sản phẩm, vui lòng đợi...');
+                    return false;
+                }
+
+                if (!formIsValid) {
+                    e.preventDefault();
+                    alert('Tên sản phẩm đã tồn tại. Vui lòng chọn tên khác.');
+                    return false;
+                }
+                return true;
+            });
+        });
+    </script>
+
+    <style>
+        .ui-autocomplete {
+            max-height: 200px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            z-index: 1000;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            border-color: #6c757d;
+            cursor: not-allowed;
+        }
+    </style>
+}

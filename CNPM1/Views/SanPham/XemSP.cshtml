@@ -1,0 +1,148 @@
+﻿@model IEnumerable<CNPM1.Models.SanPham>
+
+@{
+    ViewBag.Title = "Danh sách Sản phẩm";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var exportedQuantities = ViewBag.ExportedQuantities as Dictionary<int, int> ?? new Dictionary<int, int>();
+    var remainingQuantities = ViewBag.RemainingQuantities as Dictionary<int, int> ?? new Dictionary<int, int>();
+}
+
+<h2>Sản phẩm</h2>
+
+<p>
+    @Html.ActionLink("Nhập sản phẩm", "TaoSP", "SanPham", new { }, new { @class = "btn btn-primary" })
+</p>
+@if (TempData["ThongBao"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["ThongBao"]
+    </div>
+}
+<table class="table table-striped">
+    <tr class="success">
+        <th>
+            @Html.DisplayName("Tên Sản phẩm")
+        </th>
+        <th>
+            @Html.DisplayName("Số lượng trong kho")
+        </th>
+        <th>
+            @Html.DisplayName("Số lượng đã xuất")
+        </th>
+        <th>
+            @Html.DisplayName("Số lượng còn lại")
+        </th>
+        <th>
+            @Html.DisplayName("Trạng thái")
+        </th>
+        <th>
+            @Html.DisplayName("Hoạt động")
+        </th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        var exportedQty = exportedQuantities.ContainsKey(item.id) ? exportedQuantities[item.id] : 0;
+        var remainingQty = remainingQuantities.ContainsKey(item.id) ? remainingQuantities[item.id] : Convert.ToInt32(item.SLSP);
+        var statusClass = remainingQty <= 0 ? "danger" : (remainingQty <= 10 ? "warning" : "");
+
+        <tr class="@statusClass">
+            <td>
+                <strong>@Html.DisplayFor(modelItem => item.tenSP)</strong>
+            </td>
+            <td>
+                <span class="badge badge-info">@Html.DisplayFor(modelItem => item.SLSP)</span>
+            </td>
+            <td>
+                <span class="badge badge-secondary">@exportedQty</span>
+            </td>
+            <td>
+                @if (remainingQty <= 0)
+                {
+                    <span class="badge badge-danger">@remainingQty</span>
+                }
+                else if (remainingQty <= 10)
+                {
+                    <span class="badge badge-warning">@remainingQty</span>
+                }
+                else
+                {
+                    <span class="badge badge-success">@remainingQty</span>
+                }
+            </td>
+            <td>
+                @if (remainingQty <= 0)
+                {
+                    <span class="label label-danger">Hết hàng</span>
+                }
+                else if (remainingQty <= 10)
+                {
+                    <span class="label label-warning">Sắp hết</span>
+                }
+                else
+                {
+                    <span class="label label-success">Còn hàng</span>
+                }
+            </td>
+            <td>
+                @Html.ActionLink("Thêm số lượng", "SuaSP", "SanPham", new { id = item.id }, new { @class = "btn btn-sm btn-primary" }) |
+                @Html.ActionLink("Chi tiết", "ChiTietSP", "SanPham", new { id = item.id }, new { @class = "btn btn-sm btn-success" }) |
+                @Html.ActionLink("Xóa", "XoaSP", "SanPham", new { id = item.id }, new { @class = "btn btn-sm btn-danger" })
+            </td>
+        </tr>
+    }
+</table>
+
+<style>
+    .table tr.danger {
+        background-color: #f2dede !important;
+    }
+
+    .table tr.warning {
+        background-color: #fcf8e3 !important;
+    }
+
+    .badge {
+        font-size: 12px;
+        padding: 4px 8px;
+    }
+
+    .badge-info {
+        background-color: #5bc0de;
+    }
+
+    .badge-secondary {
+        background-color: #6c757d;
+    }
+
+    .badge-success {
+        background-color: #5cb85c;
+    }
+
+    .badge-warning {
+        background-color: #f0ad4e;
+    }
+
+    .badge-danger {
+        background-color: #d9534f;
+    }
+
+    .label {
+        padding: 3px 6px;
+        border-radius: 3px;
+        color: white;
+        font-size: 11px;
+    }
+
+    .label-success {
+        background-color: #5cb85c;
+    }
+
+    .label-warning {
+        background-color: #f0ad4e;
+    }
+
+    .label-danger {
+        background-color: #d9534f;
+    }
+</style>

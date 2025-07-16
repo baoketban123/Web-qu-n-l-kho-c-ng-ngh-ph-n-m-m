@@ -1,0 +1,54 @@
+﻿@model IEnumerable<CNPM1.Models.Sale>
+
+@{
+    ViewBag.Title = "XemSP";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Xuất Sản phẩm</h2>
+
+<p>
+    @Html.ActionLink("Xuất sản phẩm", "TaoSP", "Xuat", new { }, new { @class = "btn btn-primary" })
+</p>
+
+@if (TempData["ThongBao"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["ThongBao"]
+    </div>
+}
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayName("Tên Sản phẩm")
+        </th>
+        <th>
+            @Html.DisplayName("Số lượng")
+        </th>
+        <th>
+            @Html.DisplayName("Ngày xuất")
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.tenSPSale)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SLSale)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DateSale)
+            </td>
+            <td>
+                @Html.ActionLink("Chỉnh sửa", "Edit", "Xuat", new { id = item.id }, new { @class = "btn btn-primary" }) |
+                @Html.ActionLink("Chi tiết", "Details", "Xuat", new { id = item.id }, new { @class = "btn btn-success" }) |
+                @Html.ActionLink("Xóa", "Delete", "Xuat", new { id = item.id }, new { @class = "btn btn-danger" })
+            </td>
+        </tr>
+    }
+
+</table>
