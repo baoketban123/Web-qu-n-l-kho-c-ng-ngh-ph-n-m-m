@@ -28,5 +28,7 @@ namespace CNPM1.Models
         public virtual DbSet<HoaDon> HoaDons { get; set; }
         public virtual DbSet<Sale> Sales { get; set; }
         public virtual DbSet<SanPham> SanPhams { get; set; }
+        public virtual DbSet<Role> Roles { get; set; }
+        public virtual DbSet<TaiKhoan> TaiKhoans { get; set; }
     }
 }

@@ -1,0 +1,64 @@
+﻿@{
+    ViewBag.Title = "Register";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="login-container">
+    @using (Html.BeginForm("Register", "Login", FormMethod.Post, new { @class = "form-horizontal" }))
+    {
+        @Html.AntiForgeryToken()
+        <h2>Đăng kí</h2>
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+        <div class="form-group">
+            @Html.Label("userName", "Tên đăng nhập", new { @class = "control-label col-md-4" })
+            <div class="col-md-8">
+                @Html.TextBox("userName", null, new { @class = "form-control" })
+                @Html.ValidationMessage("userName", "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.Label("passName", "Mật khẩu", new { @class = "control-label col-md-4" })
+            <div class="col-md-8">
+                @Html.Password("passName", null, new { @class = "form-control" })
+                @Html.ValidationMessage("passName", "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.Label("email", "Email", new { @class = "control-label col-md-4" })
+            <div class="col-md-8">
+                @Html.TextBox("email", null, new { @class = "form-control", @type = "email" })
+                @Html.ValidationMessage("email", "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <p/>
+        <div class="form-group">
+            <div class="col-md-offset-4 col-md-8">
+                <button type="submit" value="Register" class="btn btn-primary">Đăng kí</button>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-4 col-md-8">
+                <p>Bạn đã có tài khoản @Html.ActionLink("Đăng nhập", "Login", "Login")</p>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    .login-container {
+        width: 400px;
+        margin: 50px auto;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    .form-horizontal .form-group {
+        margin-left: 0;
+        margin-right: 0;
+    }
+</style>
