@@ -19,7 +19,7 @@
         <div class="form-group">
             @Html.Label("Tên hàng xuất", htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.DropDownListFor(model => model.tenSPSale, (SelectList)ViewBag.SanPhamList, "-- Select Product --", new { @class = "form-control", @data_val = "true", @required = "required" })
+                @Html.DropDownListFor(model => model.tenSPSale, (SelectList)ViewBag.SanPhamList, "-- Select Product --", new { @class = "form-control", @data_val = "true", @required = "required", @id = "productSelect" })
                 @Html.ValidationMessageFor(model => model.tenSPSale, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -27,19 +27,23 @@
         <div class="form-group">
             @Html.Label("Số lượng", htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.SLSale, new { htmlAttributes = new { @class = "form-control", @data_val = "true", @required = "required" ,type = "number"} })
+                @Html.EditorFor(model => model.SLSale, new { htmlAttributes = new { @class = "form-control", @data_val = "true", @required = "required", type = "number", @id = "quantityInput" } })
+                <small class="form-text text-muted">
+                    <span id="stockInfo" style="color: #007bff; font-weight: bold;">Vui lòng chọn sản phẩm để xem số lượng tồn kho</span>
+                </small>
                 @Html.ValidationMessageFor(model => model.SLSale, "", new { @class = "text-danger" })
             </div>
         </div>
 
         <div class="form-group">
-            @Html.Label("Ngày", htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.Label("Ngày xuất", htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.TextBoxFor(model => model.DateSale, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date", @data_val = "true", @required = "required" })
-                @Html.ValidationMessageFor(model => model.DateSale, "Vui lòng chọn ngày", new { @class = "text-danger" })
+                @Html.EditorFor(model => model.DateSale, new { htmlAttributes = new { @class = "form-control", @readonly = "readonly", @Value = DateTime.Now.ToString("yyyy-MM-dd") } })
+                @Html.ValidationMessageFor(model => model.DateSale, "", new { @class = "text-danger" })
+                <small class="form-text text-muted">Ngày xuất được tự động thiết lập là ngày hiện tại</small>
             </div>
         </div>
-        <p/>
+        <p />
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
                 <input type="submit" value="Create" class="btn btn-success" />
@@ -50,4 +54,51 @@
 
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
+    <script>
+        $(document).ready(function() {
+
+            var productStock = @Html.Raw(Json.Encode(ViewBag.ProductStock));
+
+            $('#productSelect').change(function() {
+                var selectedProduct = $(this).val();
+                var stockInfo = $('#stockInfo');
+                var quantityInput = $('#quantityInput');
+
+                if (selectedProduct && productStock[selectedProduct] !== undefined) {
+                    var remainingStock = productStock[selectedProduct];
+                    stockInfo.html('Số lượng tồn kho: <strong>' + remainingStock + '</strong>');
+
+                    quantityInput.attr('max', remainingStock);
+
+                    if (remainingStock > 0) {
+                        stockInfo.css('color', '#28a745');
+                    } else {
+                        stockInfo.css('color', '#dc3545');
+                        stockInfo.html('Số lượng tồn kho: <strong>0</strong> - Không thể xuất hàng');
+                    }
+                } else {
+                    stockInfo.html('Vui lòng chọn sản phẩm để xem số lượng tồn kho');
+                    stockInfo.css('color', '#007bff');
+                    quantityInput.removeAttr('max');
+                }
+            });
+
+            $('#quantityInput').on('input', function() {
+                var selectedProduct = $('#productSelect').val();
+                var enteredQuantity = parseInt($(this).val()) || 0;
+                var stockInfo = $('#stockInfo');
+
+                if (selectedProduct && productStock[selectedProduct] !== undefined) {
+                    var remainingStock = productStock[selectedProduct];
+
+                    if (enteredQuantity > remainingStock) {
+                        stockInfo.html('Số lượng tồn kho: <strong>' + remainingStock + '</strong> - <span style="color: #dc3545;">Số lượng xuất vượt quá tồn kho!</span>');
+                    } else {
+                        stockInfo.html('Số lượng tồn kho: <strong>' + remainingStock + '</strong>');
+                        stockInfo.css('color', '#28a745');
+                    }
+                }
+            });
+        });
+    </script>
 }

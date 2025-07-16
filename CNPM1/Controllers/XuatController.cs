@@ -40,23 +40,106 @@ namespace CNPM1.Controllers
         }
 
         [HttpGet]
-        public ActionResult TaoSp()
+        public ActionResult TaoSP()
         {
-            var sanPhamList = db.SanPhams.Select(sp => sp.tenSP).ToList();
-            ViewBag.SanPhamList = new SelectList(sanPhamList);
-            return View();
+            //Tạo model với ngày hiện tại
+            var model = new Sale
+            {
+                DateSale = DateTime.Now
+            };
+
+            var products = db.SanPhams.ToList();
+
+            // Dropdown
+            ViewBag.SanPhamList = new SelectList(products, "tenSP", "tenSP");
+
+            // tính tồn kho
+            var productStock = new Dictionary<string, int>();
+
+            foreach (var product in products)
+            {
+                // tính tổng xuất
+                var totalExported = db.Sales
+                    .Where(s => s.tenSPSale == product.tenSP)
+                    .AsEnumerable() //bug LINQ 
+                    .Sum(s => Convert.ToInt32(s.SLSale ?? "0"));
+
+                // tính tổng còn lại
+                var currentQuantity = Convert.ToInt32(product.SLSP ?? "0");
+                var remainingQuantity = currentQuantity - totalExported;
+
+                productStock[product.tenSP] = Math.Max(0, remainingQuantity); // check không phải số âm
+            }
+
+            ViewBag.ProductStock = productStock;
+
+            return View(model);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult TaoSP([Bind(Include = "tenSPSale,SLSale,DateSale")] Sale sale)
+        public ActionResult TaoSP(Sale sale)
         {
             if (ModelState.IsValid)
             {
+                sale.DateSale = DateTime.Now;
+
+                var product = db.SanPhams.FirstOrDefault(p => p.tenSP == sale.tenSPSale);
+                if (product != null)
+                {
+                    var totalExported = db.Sales
+                        .Where(s => s.tenSPSale == sale.tenSPSale)
+                        .AsEnumerable()
+                        .Sum(s => Convert.ToInt32(s.SLSale ?? "0"));
+
+                    var currentQuantity = Convert.ToInt32(product.SLSP ?? "0");
+                    var remainingQuantity = currentQuantity - totalExported;
+                    var requestedQuantity = Convert.ToInt32(sale.SLSale);
+
+                    if (requestedQuantity > remainingQuantity)
+                    {
+                        ModelState.AddModelError("SLSale", $"Số lượng xuất ({requestedQuantity}) vượt quá số lượng tồn kho ({remainingQuantity})");
+
+                        var products = db.SanPhams.ToList();
+                        ViewBag.SanPhamList = new SelectList(products, "tenSP", "tenSP");
+
+                        var productStock = new Dictionary<string, int>();
+                        foreach (var p in products)
+                        {
+                            var exported = db.Sales
+                                .Where(s => s.tenSPSale == p.tenSP)
+                                .AsEnumerable()
+                                .Sum(s => Convert.ToInt32(s.SLSale ?? "0"));
+                            var current = Convert.ToInt32(p.SLSP ?? "0");
+                            productStock[p.tenSP] = Math.Max(0, current - exported);
+                        }
+                        ViewBag.ProductStock = productStock;
+
+                        return View(sale);
+                    }
+                }
+
                 db.Sales.Add(sale);
                 db.SaveChanges();
+                TempData["ThongBao"] = "Xuất hàng thành công!";
                 return RedirectToAction("XemSP");
             }
+
+            var allProducts = db.SanPhams.ToList();
+            ViewBag.SanPhamList = new SelectList(allProducts, "tenSP", "tenSP");
+
+            var stockData = new Dictionary<string, int>();
+            foreach (var product in allProducts)
+            {
+                var totalExported = db.Sales
+                    .Where(s => s.tenSPSale == product.tenSP)
+                    .AsEnumerable()
+                    .Sum(s => Convert.ToInt32(s.SLSale ?? "0"));
+                var currentQuantity = Convert.ToInt32(product.SLSP ?? "0");
+                stockData[product.tenSP] = Math.Max(0, currentQuantity - totalExported);
+            }
+            ViewBag.ProductStock = stockData;
+
             return View(sale);
         }
         public ActionResult Details(int? id)
