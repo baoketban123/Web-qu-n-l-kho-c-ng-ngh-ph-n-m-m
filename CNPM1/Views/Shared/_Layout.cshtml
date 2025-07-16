@@ -33,8 +33,25 @@
         </div>
     </div>
     <!-- [ Pre-loader ] End -->
+    <!-- [ Top Bar ] start -->
+    <div class="user-status-bar" style="background-color: #f8f9fa; padding: 10px 20px; border-bottom: 1px solid #dee2e6; position: fixed; top: 0; left: 0; right: 0; z-index: 1035;">
+        @if (Session["UserName"] != null)
+        {
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-left: 15%;">
+                <span>Chào mừng, <strong>@Session["UserName"]</strong></span>
+                <a href="/Login/Logout" style="color: #dc3545; text-decoration: none;">Đăng xuất</a>
+            </div>
+        }
+        else
+        {
+            <div style="text-align: center; color: #dc3545; font-weight: bold;">
+                Bạn chưa đăng nhập. Vui lòng <a href="/Login/Login" style="color: #007bff;">đăng nhập</a> để tiếp tục.
+            </div>
+        }
+    </div>
+    <!-- [ Top Bar ] End -->
     <!-- [ Sidebar Menu ] start -->
-    <nav class="pc-sidebar">
+    <nav class="pc-sidebar" style="margin-top: 50px;">
         <div class="navbar-wrapper">
             <div class="m-header flex items-center py-4 px-6 h-header-height">
                 <a href="/Home/Index" class="b-brand flex items-center gap-3">
@@ -49,7 +66,6 @@
                         <label>Trang chủ</label>
                     </li>
                     <li class="pc-item">
-                    <li class="pc-item">
                         <a href="/Home/Index" class="pc-link">
                             <span class="pc-micon">
                                 <i data-feather="home"></i>
@@ -57,35 +73,57 @@
                             <span class="pc-mtext">Trang chủ</span>
                         </a>
                     </li>
-                    <li class="pc-item pc-caption">
-                        <label>Chức năng</label>
-                        <i data-feather="feather"></i>
-                    </li>
-                    <li class="pc-item pc-hasmenu">
-                        <a href="/SanPham/XemSP" class="pc-link">
-                            <span class="pc-micon"> <i data-feather="edit"></i></span>
-                            <span class="pc-mtext">Sản phẩm</span>
-                        </a>
-                    </li>
+
+                    @if (Session["UserName"] != null)
+                    {
+                        <li class="pc-item pc-caption">
+                            <label>Chức năng</label>
+                            <i data-feather="feather"></i>
+                        </li>
+                        <li class="pc-item pc-hasmenu">
+                            <a href="/SanPham/XemSP" class="pc-link">
+                                <span class="pc-micon"> <i data-feather="edit"></i></span>
+                                <span class="pc-mtext">Sản phẩm</span>
+                            </a>
+                        </li>
+
+                        <li class="pc-item pc-hasmenu">
+                            <a href="/Xuat/XemSP" class="pc-link">
+                                <span class="pc-micon"> <i data-feather="type"></i></span>
+                                <span class="pc-mtext">Xuất Sản phẩm</span>
+                            </a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="pc-item pc-caption">
+                            <label>Xác thực</label>
+                            <i data-feather="feather"></i>
+                        </li>
+                    }
 
                     <li class="pc-item pc-hasmenu">
-                        <a href="/Xuat/XemSP" class="pc-link">
-                            <span class="pc-micon"> <i data-feather="type"></i></span>
-                            <span class="pc-mtext">Xuất Sản phẩm</span>
-                        </a>
-                    </li>
-                    <li class="pc-item pc-hasmenu">
-                        <a href="/Login/Login" class="pc-link">
-                            <span class="pc-micon"> <i data-feather="feather"></i></span>
-                            <span class="pc-mtext">Đăng nhập</span>
-                        </a>
+                        @if (Session["UserName"] != null)
+                        {
+                            <a href="/Login/Logout" class="pc-link">
+                                <span class="pc-micon"> <i data-feather="log-out"></i></span>
+                                <span class="pc-mtext">Đăng xuất</span>
+                            </a>
+                        }
+                        else
+                        {
+                            <a href="/Login/Login" class="pc-link">
+                                <span class="pc-micon"> <i data-feather="log-in"></i></span>
+                                <span class="pc-mtext">Đăng nhập</span>
+                            </a>
+                        }
                     </li>
 
                     <li class="pc-item pc-caption">
                         <label>Khác</label>
                         <i data-feather="sidebar"></i>
                     </li>
-                
+
                     <li class="pc-item">
                         <a href="/Home/About" class="pc-link">
                             <span class="pc-micon">
@@ -98,6 +136,7 @@
             </div>
         </div>
     </nav>
+
     <script src="../assets/js/plugins/simplebar.min.js"></script>
     <script src="../assets/js/plugins/popper.min.js"></script>
     <script src="../assets/js/icon/custom-icon.js"></script>
@@ -109,16 +148,13 @@
     <div class="floting-button fixed bottom-[50px] right-[30px] z-[1030]">
     </div>
 
-
     <script>
         layout_change('false');
     </script>
 
-
     <script>
         layout_theme_sidebar_change('dark');
     </script>
-
 
     <script>
         change_box_container('false');
@@ -140,14 +176,27 @@
         main_layout_change('vertical');
     </script>
 
-    <div class="container body-content" style="margin-left:15%">
-        @RenderBody()
+    <div class="container body-content" style="margin-left:15%; margin-top: 50px;">
+        @if (Session["UserName"] == null &&
+             !Request.Url.AbsolutePath.Contains("/Login/") &&
+             !Request.Url.AbsolutePath.Contains("/Home/About"))
+        {
+            <div class="alert alert-warning text-center">
+                <h3>Truy cập bị hạn chế</h3>
+                <p>Bạn cần đăng nhập để truy cập chức năng này.</p>
+                <a href="/Login/Login" class="btn btn-primary">Đăng nhập ngay</a>
+            </div>
+        }
+        else
+        {
+            @RenderBody()
+        }
+
         <hr />
         <footer>
             <p>&copy; @DateTime.Now.Year - Công nghệ Phần mềm</p>
         </footer>
     </div>
-
 
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")

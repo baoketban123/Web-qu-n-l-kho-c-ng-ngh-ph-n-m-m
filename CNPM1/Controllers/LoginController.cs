@@ -11,28 +11,33 @@ namespace cnpm_ck.Controllers
     public class LoginController : Controller
     {
         CNPM_WMS_DBEntities db = new CNPM_WMS_DBEntities();
+
         public ActionResult Login()
         {
             return View();
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Login(TaiKhoan cus)
+        public ActionResult Login(string userName, string passName)
         {
-            if(ModelState.IsValid)
+            if (ModelState.IsValid)
             {
-                //Tìm khách hàng có tên đăng nhập và pass hợp lệ trong csdl
-                var nguoidung= db.TaiKhoans.FirstOrDefault(x=>x.userName==cus.userName&&x.passName==cus.passName);
-                if(nguoidung!=null)
+                var nguoidung = db.TaiKhoans.FirstOrDefault(x => x.userName == userName && x.passName == passName);
+                if (nguoidung != null)
                 {
-                    Session["user"]=cus.userName;
-                    Session["idrole"]=cus.idRole;
-                    if(nguoidung.idRole==1)
+                    Session["user"] = userName;
+                    Session["UserName"] = userName; 
+                    Session["idrole"] = nguoidung.idRole;
+
+                    if (nguoidung.idRole == 1)
                     {
                         return RedirectToAction("Index", "Home");
                     }
                     else
-                        return RedirectToAction("About", "Home");
+                    {
+                        return RedirectToAction("Index", "Home");
+                    }
                 }
                 else
                 {
@@ -40,38 +45,63 @@ namespace cnpm_ck.Controllers
                     return View();
                 }
             }
-            return RedirectToAction("Contact", "Home");
+            return View();
         }
+
         public ActionResult Register()
         {
             return View();
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Register(TaiKhoan cus)
         {
-            //kt xem có người nào đã đăng kí với tên đăng nhập này hay chưa
+            // Check if someone has already registered with this username
             var nguoidung = db.TaiKhoans.FirstOrDefault(x => x.userName == cus.userName);
             if (ModelState.IsValid)
             {
                 if (nguoidung != null)
+                {
                     ModelState.AddModelError(string.Empty, "Tên đăng kí đã được sử dụng");
+                }
                 if (ModelState.IsValid)
                 {
+                    // Set default role if not specified
+                    if (cus.idRole == null)
+                    {
+                        cus.idRole = 2; // Default role
+                    }
+
                     db.TaiKhoans.Add(cus);
                     db.SaveChanges();
+                    return RedirectToAction("Login");
                 }
-                else { return View(); }
+                else
+                {
+                    return View();
+                }
             }
-            return RedirectToAction("Login");
+            return View();
         }
+
         public ActionResult DangXuat()
         {
-            //xóa session
+            // Remove session
             Session.Remove("user");
-            //xóa session from authenticator
+            Session.Remove("UserName");
+            Session.Remove("idrole");
+            // Remove session from authenticator
             FormsAuthentication.SignOut();
             return RedirectToAction("Index", "Home");
+        }
+
+        [HttpGet]
+        public ActionResult Logout()
+        {
+            Session.Clear();
+            Session.Abandon();
+            return RedirectToAction("Login", "Login");
         }
     }
 }
