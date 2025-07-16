@@ -641,6 +641,7 @@
     <Content Include="Views\Xuat\Edit.cshtml" />
     <Content Include="Views\Xuat\Delete.cshtml" />
     <Content Include="Views\Xuat\TaoSP.cshtml" />
+    <Content Include="Views\Xuat\DetailsBaoCao.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -1,0 +1,127 @@
+﻿@model IEnumerable<CNPM1.Models.Sale>
+
+@{
+    ViewBag.Title = "Báo cáo xuất sản phẩm";
+    Layout = "~/Views/Shared/_LayoutNV.cshtml";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewBag.Title</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .company-name {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .report-title {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .date-range {
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+
+        .summary {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+        }
+
+        .print-button {
+            margin-bottom: 20px;
+        }
+
+        @@media print {
+            .print-button {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="print-button">
+        <button onclick="window.print()" class="btn btn-primary">In báo cáo</button>
+        <button onclick="window.close()" class="btn btn-secondary">Đóng</button>
+    </div>
+
+    <div class="header">
+        <div class="company-name">CÔNG TY QUẢN LÝ KHO</div>
+        <div class="report-title">BÁO CÁO XUẤT SẢN PHẨM</div>
+        <div class="date-range">
+            @if (!string.IsNullOrEmpty(ViewBag.FromDate as string) || !string.IsNullOrEmpty(ViewBag.ToDate as string))
+            {
+                <span>Từ ngày: @(ViewBag.FromDate ?? "...") đến ngày: @(ViewBag.ToDate ?? "...")</span>
+            }
+            else
+            {
+                <span>Tất cả các ngày</span>
+            }
+        </div>
+        <div>Ngày in: @DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")</div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>STT</th>
+                <th>Tên Sản phẩm</th>
+                <th>Số lượng</th>
+                <th>Ngày xuất</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{int stt = 1;}
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@stt</td>
+                    <td>@item.tenSPSale</td>
+                    <td>@item.SLSale</td>
+                    <td>@item.DateSale.ToString("dd/MM/yyyy")</td>
+                </tr>
+                stt++;
+            }
+        </tbody>
+    </table>
+
+    <div class="summary">
+        <h4>TỔNG KẾT</h4>
+        <p><strong>Tổng số bản ghi:</strong> @ViewBag.TotalRecords</p>
+        <p><strong>Tổng số lượng xuất:</strong> @ViewBag.TotalQuantity</p>
+    </div>
+</body>
+</html>

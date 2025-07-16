@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
+using static System.Data.Entity.Infrastructure.Design.Executor;
 
 namespace CNPM1.Controllers
 {
@@ -14,10 +15,28 @@ namespace CNPM1.Controllers
 
         CNPM_WMS_DBEntities db = new CNPM_WMS_DBEntities();
         [HttpGet]
-        public ActionResult XemSP()
+        public ActionResult XemSP(string fromDate, string toDate)
         {
-            List<Sale> list = db.Sales.OrderByDescending(x => x.id).ToList();
-            return View(list);
+            var sales = db.Sales.AsQueryable();
+
+            // Apply date filtering if dates are provided
+            if (!string.IsNullOrEmpty(fromDate))
+            {
+                DateTime from = DateTime.Parse(fromDate);
+                sales = sales.Where(s => s.DateSale >= from);
+                ViewBag.FromDate = fromDate;
+            }
+
+            if (!string.IsNullOrEmpty(toDate))
+            {
+                DateTime to = DateTime.Parse(toDate).AddDays(1); // Include the entire end date
+                sales = sales.Where(s => s.DateSale < to);
+                ViewBag.ToDate = toDate;
+            }
+
+            var listSales = sales.OrderByDescending(x => x.DateSale).ToList();
+
+            return View(listSales);
         }
 
         [HttpGet]
@@ -51,6 +70,36 @@ namespace CNPM1.Controllers
 
             return View(sale);
         }
+
+        [HttpGet]
+        public ActionResult DetailsBaoCao(string fromDate, string toDate)
+        {
+            var sales = db.Sales.AsQueryable();
+
+            // Apply date filtering if dates are provided
+            if (!string.IsNullOrEmpty(fromDate))
+            {
+                DateTime from = DateTime.Parse(fromDate);
+                sales = sales.Where(s => s.DateSale >= from);
+                ViewBag.FromDate = fromDate;
+            }
+
+            if (!string.IsNullOrEmpty(toDate))
+            {
+                DateTime to = DateTime.Parse(toDate).AddDays(1);
+                sales = sales.Where(s => s.DateSale < to);
+                ViewBag.ToDate = toDate;
+            }
+
+            var listSales = sales.OrderByDescending(x => x.DateSale).ToList();
+
+            // Calculate totals for the report
+            ViewBag.TotalQuantity = listSales.Sum(s => Convert.ToInt32(s.SLSale));
+            ViewBag.TotalRecords = listSales.Count();
+
+            return View(listSales);
+        }
+
         [HttpGet]
 
         public ActionResult Edit(int? id)

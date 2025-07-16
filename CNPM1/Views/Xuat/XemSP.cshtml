@@ -17,6 +17,37 @@
         @TempData["ThongBao"]
     </div>
 }
+
+<!-- Date Range Search Form -->
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4>Tìm kiếm theo ngày xuất</h4>
+    </div>
+    <div class="panel-body">
+        @using (Html.BeginForm("XemSP", "Xuat", FormMethod.Get, new { @class = "form-inline" }))
+        {
+            <div class="form-group">
+                <label for="fromDate">Từ ngày:</label>
+                @Html.TextBox("fromDate", ViewBag.FromDate as string, new { @class = "form-control", @type = "date" })
+            </div>
+            <div class="form-group">
+                <label for="toDate">Đến ngày:</label>
+                @Html.TextBox("toDate", ViewBag.ToDate as string, new { @class = "form-control", @type = "date" })
+            </div>
+            <p></p>
+            <div class="form-group">
+                <input type="submit" value="Tìm kiếm" class="btn btn-info" />
+                @Html.ActionLink("Xóa bộ lọc", "XemSP", "Xuat", new { }, new { @class = "btn btn-default" })
+                @Html.ActionLink("In báo cáo", "DetailsBaoCao", "Xuat",
+                         new { fromDate = ViewBag.FromDate, toDate = ViewBag.ToDate },
+                         new { @class = "btn btn-success", @target = "_blank" })
+            </div>
+        }
+    </div>
+</div>
+
+<p></p>
+
 <table class="table">
     <tr>
         <th>
